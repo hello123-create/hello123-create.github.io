@@ -2,81 +2,125 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>My School Bell Times</title>
+  <title>Baulko Bell Times</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
+    :root {
+      --bg-color: #f0f4ff;
+      --text-color: #222;
+      --accent: #4b0082;
+      --card-bg: #fff;
+    }
+
+    [data-theme="dark"] {
+      --bg-color: #121212;
+      --text-color: #f1f1f1;
+      --card-bg: #1e1e1e;
+    }
+
     body {
+      margin: 0;
       font-family: 'Segoe UI', sans-serif;
-      background-color: #f6f9ff;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      padding: 20px;
+      transition: background-color 0.3s;
+    }
+
+    header {
       text-align: center;
-      color: #222;
-      padding: 40px;
     }
 
     h1 {
-      color: #4b0082;
-      font-size: 2.5rem;
-      margin-bottom: 10px;
+      color: var(--accent);
+      margin-bottom: 5px;
     }
 
-    #countdown {
-      font-size: 2rem;
-      color: #ff4e4e;
+    #nameArea {
       margin-top: 10px;
     }
 
-    table {
-      margin: 30px auto;
-      border-collapse: collapse;
-      font-size: 1.1rem;
+    input[type="text"] {
+      padding: 5px 10px;
+      font-size: 1rem;
     }
 
-    th, td {
-      padding: 10px 20px;
+    .section {
+      margin: 30px auto;
+      max-width: 600px;
+      background: var(--card-bg);
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    #countdown {
+      font-size: 1.5rem;
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    textarea {
+      width: 100%;
+      height: 80px;
+      padding: 10px;
+      font-size: 1rem;
+      resize: vertical;
+      border-radius: 5px;
       border: 1px solid #ccc;
     }
 
-    th {
-      background-color: #4b0082;
-      color: white;
+    ul {
+      padding: 0;
+      list-style: none;
     }
 
-    td {
-      background-color: #fff;
+    ul li {
+      margin: 6px 0;
     }
 
-    .footer {
+    footer {
       margin-top: 40px;
+      text-align: center;
       font-size: 0.9rem;
-      color: #888;
+      color: #777;
+    }
+
+    #themeToggle {
+      float: right;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
 
-  <h1>📚 Welcome to Our School Bell Page</h1>
-  <div>Next bell in:</div>
-  <div id="countdown">Loading...</div>
+  <header>
+    <div id="themeToggle">🌓</div>
+    <h1>Welcome to Baulko Bell Times</h1>
+    <div id="nameArea">
+      Hi <span id="username">there</span>! 👋 What's your name?
+      <input type="text" id="nameInput" placeholder="Enter your name" />
+    </div>
+  </header>
 
-  <table>
-    <thead>
-      <tr>
-        <th>Period</th>
-        <th>Time</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr><td>Period 1</td><td>9:00 AM</td></tr>
-      <tr><td>Period 2</td><td>10:00 AM</td></tr>
-      <tr><td>Recess</td><td>11:00 AM</td></tr>
-      <tr><td>Period 3</td><td>11:30 AM</td></tr>
-      <tr><td>Period 4</td><td>12:30 PM</td></tr>
-      <tr><td>Lunch</td><td>1:30 PM</td></tr>
-      <tr><td>Period 5</td><td>2:00 PM</td></tr>
-      <tr><td>End of Day</td><td>3:00 PM</td></tr>
-    </tbody>
-  </table>
+  <div class="section">
+    <h2>🔔 Next Bell In:</h2>
+    <div id="countdown">Loading...</div>
+  </div>
 
-  <div class="footer">Built by Amudha ✨</div>
+  <div class="section">
+    <h2>🔗 Quick Links</h2>
+    <textarea id="quickLinks" placeholder="Paste your daily links here..."></textarea>
+  </div>
+
+  <div class="section">
+    <h2>📝 Notes</h2>
+    <textarea id="notes" placeholder="Write yourself a reminder..."></textarea>
+  </div>
+
+  <footer>
+    Built by Amudha ✨ — inspired by Baulko Bell Times
+  </footer>
 
   <script>
     const bellTimes = [
@@ -90,11 +134,19 @@
       { hour: 15, minute: 0 }
     ];
 
+    const nameInput = document.getElementById("nameInput");
+    const userName = document.getElementById("username");
+    const countdown = document.getElementById("countdown");
+    const quickLinks = document.getElementById("quickLinks");
+    const notes = document.getElementById("notes");
+    const themeToggle = document.getElementById("themeToggle");
+    const body = document.body;
+
     function updateCountdown() {
       const now = new Date();
       const nowMins = now.getHours() * 60 + now.getMinutes();
-
       let nextBell = null;
+
       for (let time of bellTimes) {
         const bellMins = time.hour * 60 + time.minute;
         if (bellMins > nowMins) {
@@ -105,7 +157,7 @@
       }
 
       if (!nextBell) {
-        document.getElementById("countdown").textContent = "🎉 School's out!";
+        countdown.textContent = "🎉 School's out!";
         return;
       }
 
@@ -113,11 +165,44 @@
       const h = Math.floor(diff / (1000 * 60 * 60));
       const m = Math.floor((diff / (1000 * 60)) % 60);
       const s = Math.floor((diff / 1000) % 60);
-
-      document.getElementById("countdown").textContent =
-        `${h}h ${m}m ${s}s`;
+      countdown.textContent = `${h}h ${m}m ${s}s`;
     }
 
+    function loadUserData() {
+      const storedName = localStorage.getItem("name");
+      if (storedName) {
+        userName.textContent = storedName;
+        nameInput.value = storedName;
+      }
+
+      quickLinks.value = localStorage.getItem("quickLinks") || "";
+      notes.value = localStorage.getItem("notes") || "";
+      const theme = localStorage.getItem("theme");
+      if (theme) body.setAttribute("data-theme", theme);
+    }
+
+    nameInput.addEventListener("input", () => {
+      const name = nameInput.value;
+      userName.textContent = name || "there";
+      localStorage.setItem("name", name);
+    });
+
+    quickLinks.addEventListener("input", () => {
+      localStorage.setItem("quickLinks", quickLinks.value);
+    });
+
+    notes.addEventListener("input", () => {
+      localStorage.setItem("notes", notes.value);
+    });
+
+    themeToggle.addEventListener("click", () => {
+      const current = body.getAttribute("data-theme");
+      const next = current === "dark" ? "light" : "dark";
+      body.setAttribute("data-theme", next);
+      localStorage.setItem("theme", next);
+    });
+
+    loadUserData();
     updateCountdown();
     setInterval(updateCountdown, 1000);
   </script>
